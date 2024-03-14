@@ -10,7 +10,7 @@ go install github.com/kolah/github-batch-updater/cmd/gbu@latest
 ```
 ## Usage
 
-In order to interact with the GitHub API, you need to set the `GITHUB_PERSONAL_ACCESS_TOKEN` with a personal access token.
+In order to interact with the GitHub API, you need to set the `GITHUB_PERSONAL_ACCESS_TOKEN` env variable with a personal access token.
 The token should have the `repo` scope. If you want to interact with github workflows, you need to add the `workflow` scope.
 
 ```bash
