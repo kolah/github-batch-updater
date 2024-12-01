@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/kolah/github-batch-updater/cli"
-	"github.com/kolah/github-batch-updater/di"
+	"github.com/kolah/github-batch-updater/internal/cli"
+	"github.com/kolah/github-batch-updater/internal/di"
 )
 
 func recoverPanic(app *di.Container) {

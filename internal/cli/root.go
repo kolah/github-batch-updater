@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/kolah/github-batch-updater/di"
+	"github.com/kolah/github-batch-updater/internal/di"
 	"github.com/spf13/cobra"
 )
 
