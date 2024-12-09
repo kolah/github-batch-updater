@@ -17,24 +17,29 @@ func NewGithubRepositoryService(client *github.Client) *GithubRepositoryService 
 	return &GithubRepositoryService{client: client}
 }
 
-func (g GithubRepositoryService) GetRepository(ctx context.Context, owner, name string) (*githubDomain.Repository, error) {
+func (g GithubRepositoryService) GetRepository(ctx context.Context, owner, name, sourceBranch string) (*githubDomain.Repository, error) {
 	repositoryResult, _, err := g.client.Repositories.Get(ctx, owner, name)
 
 	if err != nil {
 		return nil, g.handleRepositoryError(err)
 	}
+	var branch string
+	if sourceBranch == "" {
+		branch = repositoryResult.GetDefaultBranch()
+	} else {
+		branch = sourceBranch
+	}
 
-	ref, _, err := g.client.Git.GetRef(ctx, owner, name, "refs/heads/"+repositoryResult.GetDefaultBranch())
+	ref, _, err := g.client.Git.GetRef(ctx, owner, name, "refs/heads/"+branch)
 	if err != nil {
 		return nil, g.handleRefError(err)
 	}
-
 	defaultBranchSHA := *ref.Object.SHA
 
-	return githubDomain.LoadRepository(owner, name, repositoryResult.GetDefaultBranch(), defaultBranchSHA), nil
+	return githubDomain.LoadRepository(owner, name, branch, defaultBranchSHA), nil
 }
 
-func (g GithubRepositoryService) CreateBranchFromDefaultBranch(
+func (g GithubRepositoryService) CreateBranchFromSourceBranch(
 	ctx context.Context,
 	repo *githubDomain.Repository,
 	branchName string,
@@ -42,7 +47,7 @@ func (g GithubRepositoryService) CreateBranchFromDefaultBranch(
 	_, _, err := g.client.Git.CreateRef(ctx, repo.Owner, repo.Name, &github.Reference{
 		Ref: github.String("refs/heads/" + branchName),
 		Object: &github.GitObject{
-			SHA: github.String(repo.DefaultBranch.SHA),
+			SHA: github.String(repo.SourceBranch.SHA),
 		},
 	})
 
@@ -60,7 +65,7 @@ func (g GithubRepositoryService) handleCreateRefError(err error) errors.SlugErro
 		case http.StatusNotFound:
 			return githubDomain.RepositoryNotFound().WrapError(err)
 		case http.StatusConflict:
-			return githubDomain.RepositoryAccessDenied().WrapError(err)
+			return githubDomain.RefAlreadyExists().WrapError(err)
 		}
 	}
 

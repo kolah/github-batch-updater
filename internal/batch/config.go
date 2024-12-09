@@ -58,6 +58,7 @@ type Config struct {
 	CreatePR     bool         `yaml:"create_pr"`
 	PullRequest  *PullRequest `yaml:"pull_request"`
 	TargetBranch string       `yaml:"target_branch"`
+	SourceBranch string       `yaml:"source_branch"`
 }
 
 func (fo *FileOperation) UnmarshalYAML(node *yaml.Node) error {
@@ -96,7 +97,7 @@ func (fo *FileOperation) UnmarshalYAML(node *yaml.Node) error {
 	return fmt.Errorf("unknown operation type: %s", kind)
 }
 
-func (c *Config) ToInput(dryRun bool) application.Input {
+func (c *Config) ToDomainInput(dryRun bool) application.Input {
 	rules := make(map[string][]transformerDomain.Rule)
 	for file, rulesConfig := range c.Files {
 		for _, rule := range rulesConfig {
@@ -133,6 +134,7 @@ func (c *Config) ToInput(dryRun bool) application.Input {
 			TeamReviewers: c.PullRequest.TeamReviewers,
 		},
 		TargetBranch: c.TargetBranch,
+		SourceBranch: c.SourceBranch,
 		CreatePR:     c.CreatePR,
 		DryRun:       dryRun,
 	}

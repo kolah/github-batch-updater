@@ -22,9 +22,16 @@ gbu run script.yml
 ```yaml
 create_pr: true
 target_branch: batch-test
+# source branch is optional, 
+# if not provided, it will be the default branch of the repository
+# source_branch: main
 repositories:
   - name: github-batch-updater
     owner: kolah
+  - name: repo2
+    owner: kolah
+  - name: repo3
+    owner: kolah    
 files:
   .github/workflows/build_image.yaml:
     - replace:

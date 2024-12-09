@@ -20,7 +20,7 @@ func (g GithubPullRequestService) Create(ctx context.Context, repo githubDomain.
 		Title: github.String(pullRequestTemplate.Title),
 		Body:  github.String(pullRequestTemplate.Body),
 		Head:  github.String(targetBranch),
-		Base:  github.String(repo.DefaultBranch.Name),
+		Base:  github.String(repo.SourceBranch.Name),
 	}
 	pr, _, err := g.client.PullRequests.Create(ctx, repo.Owner, repo.Name, newPR)
 	if err != nil {

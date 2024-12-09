@@ -10,6 +10,10 @@ func RepositoryAccessDenied() errors.SlugError {
 	return errors.AuthorizationError("repository access denied", "github.repository.access-denied")
 }
 
+func RefAlreadyExists() errors.SlugError {
+	return errors.ConflictError("ref already exists", "github.repository.ref-already-exists")
+}
+
 func UnknownError() errors.SlugError {
 	return errors.InternalError("unknown error", "github.unknown")
 }

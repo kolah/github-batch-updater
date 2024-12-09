@@ -19,11 +19,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// safeLazyValue is a thread safe lazy loader.
-// It is used to create components only when they are needed.
 type safeLazyValue[T any] struct {
-	once  sync.Once    //nolint: structcheck
-	value atomic.Value //nolint: structcheck
+	once  sync.Once
+	value atomic.Value
 }
 
 func (lv *safeLazyValue[T]) loadOrCreate(create func() T) T {

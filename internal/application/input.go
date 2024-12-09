@@ -8,6 +8,7 @@ import (
 type Input struct {
 	Repositories        []RepositoryInput
 	Rules               map[string][]transformer.Rule
+	SourceBranch        string
 	TargetBranch        string
 	PullRequestTemplate github.PullRequestTemplate
 	CreatePR            bool

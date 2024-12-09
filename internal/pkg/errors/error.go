@@ -31,6 +31,10 @@ func AuthorizationError(message, slug string) SlugError {
 	return NewSlugError(message, slug, ErrorKindAuthorization())
 }
 
+func ConflictError(message, slug string) SlugError {
+	return NewSlugError(message, slug, ErrorKindConflict())
+}
+
 func (e SlugError) Error() string {
 	if e.wrappedError != nil {
 		return e.message + ": " + e.wrappedError.Error()

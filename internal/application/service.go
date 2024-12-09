@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/kolah/github-batch-updater/internal/domain/github"
 	"github.com/kolah/github-batch-updater/internal/domain/transformer"
+	"github.com/kolah/github-batch-updater/internal/pkg/errors"
 	"github.com/kolah/github-batch-updater/internal/pkg/slices"
 )
 
@@ -46,7 +47,7 @@ func (s *BatchProcessingService) Process(ctx context.Context, input Input) {
 }
 
 func (s *BatchProcessingService) processRepository(ctx context.Context, repo RepositoryInput, input Input) error {
-	repoInfo, err := s.repoService.GetRepository(ctx, repo.Owner, repo.Name)
+	repoInfo, err := s.repoService.GetRepository(ctx, repo.Owner, repo.Name, input.SourceBranch)
 	if err != nil {
 		return err
 	}
@@ -111,8 +112,12 @@ func (s *BatchProcessingService) applyChanges(
 		return nil
 	}
 
-	err := s.repoService.CreateBranchFromDefaultBranch(ctx, repo, targetBranch)
-	if err != nil {
+	err := s.repoService.CreateBranchFromSourceBranch(ctx, repo, targetBranch)
+	if errors.Is(err, github.RefAlreadyExists()) {
+		s.logger.Info("branch already exists", "branch", targetBranch)
+	}
+
+	if err != nil && !errors.Is(err, github.RefAlreadyExists()) {
 		s.logger.Error("error creating branch", "error", err)
 		return err
 	}
@@ -136,6 +141,7 @@ func (s *BatchProcessingService) applyChanges(
 		return err
 	}
 
+	s.logger.Info("PR created", "url", pr.HTMLURL, "number", pr.Number)
 	err = s.prService.RequestReview(ctx, *repo, pr, prConfig)
 	if err != nil {
 		s.logger.Error("error requesting review", "error", err)

@@ -20,7 +20,7 @@ func NewGithubContentService(client *github.Client) *GithubContentService {
 
 func (g GithubContentService) GetFile(ctx context.Context, repo githubDomain.Repository, path string) (*githubDomain.File, error) {
 	contentResult, _, _, err := g.client.Repositories.GetContents(ctx, repo.Owner, repo.Name, path, &github.RepositoryContentGetOptions{
-		Ref: repo.DefaultBranch.SHA,
+		Ref: repo.SourceBranch.SHA,
 	})
 	if err != nil {
 		return nil, g.handleGetFileError(err)

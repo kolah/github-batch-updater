@@ -19,7 +19,7 @@ func runCommand(app *di.Container) *cobra.Command {
 				return err
 			}
 
-			app.BatchProcessingService().Process(cmd.Context(), c.ToInput(dryRun))
+			app.BatchProcessingService().Process(cmd.Context(), c.ToDomainInput(dryRun))
 
 			return nil
 		},
